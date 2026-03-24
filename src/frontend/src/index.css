@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/assets/fonts/PlusJakartaSans.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.625rem;
+    --background: 0.1 0.005 240;
+    --foreground: 0.92 0.008 240;
+    --card: 0.165 0.008 240;
+    --card-foreground: 0.92 0.008 240;
+    --popover: 0.165 0.008 240;
+    --popover-foreground: 0.92 0.008 240;
+    --primary: 0.75 0.12 185;
+    --primary-foreground: 0.1 0.005 240;
+    --secondary: 0.185 0.009 240;
+    --secondary-foreground: 0.92 0.008 240;
+    --muted: 0.185 0.009 240;
+    --muted-foreground: 0.6 0.012 240;
+    --accent: 0.75 0.12 185;
+    --accent-foreground: 0.1 0.005 240;
+    --destructive: 0.65 0.22 25;
+    --destructive-foreground: 0.985 0 0;
+    --border: 0.21 0.007 240;
+    --input: 0.21 0.007 240;
+    --ring: 0.75 0.12 185;
+    --chart-1: 0.75 0.12 185;
+    --chart-2: 0.6 0.2 240;
+    --chart-3: 0.7 0.2 145;
+    --chart-4: 0.75 0.18 65;
+    --chart-5: 0.65 0.22 25;
+    --sidebar: 0.13 0.007 240;
+    --sidebar-foreground: 0.92 0.008 240;
+    --sidebar-primary: 0.75 0.12 185;
+    --sidebar-primary-foreground: 0.1 0.005 240;
+    --sidebar-accent: 0.185 0.009 240;
+    --sidebar-accent-foreground: 0.92 0.008 240;
+    --sidebar-border: 0.21 0.007 240;
+    --sidebar-ring: 0.75 0.12 185;
+    /* Status colors */
+    --status-available: 0.7 0.2 145;
+    --status-reserved: 0.75 0.18 65;
+    --status-occupied: 0.65 0.22 25;
+    --status-booked: 0.6 0.2 240;
+    --status-pending: 0.75 0.18 65;
+    --status-verified: 0.7 0.2 145;
+    --status-rejected: 0.65 0.22 25;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    background: linear-gradient(
+      135deg,
+      oklch(0.1 0.005 240) 0%,
+      oklch(0.12 0.006 240) 100%
+    );
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: oklch(0.13 0.007 240);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.28 0.007 240);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.75 0.12 185 / 0.6);
+  }
+}
