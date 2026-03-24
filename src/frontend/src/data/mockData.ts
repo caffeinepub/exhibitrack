@@ -39,6 +39,63 @@ export interface Notification {
   time: string;
 }
 
+// --- Document Verification ---
+export type DocStatus = "Pending" | "Verified" | "Rejected";
+export type DocType =
+  | "Trade License"
+  | "ID Proof"
+  | "Health & Safety Cert"
+  | "Insurance";
+
+export interface VendorDocument {
+  id: string;
+  vendorId: string;
+  vendorName: string;
+  docType: DocType;
+  fileName: string;
+  uploadedAt: string;
+  status: DocStatus;
+  notes?: string;
+}
+
+// --- Payments ---
+export type PaymentStatus = "Paid" | "Pending" | "Overdue";
+export type PaymentMethod = "Cash" | "Card" | "Bank Transfer";
+
+export interface Payment {
+  id: string;
+  vendorId: string;
+  vendorName: string;
+  boothId: string;
+  amount: number;
+  method: PaymentMethod;
+  date: string;
+  status: PaymentStatus;
+  invoiceNo: string;
+}
+
+// --- Service Providers ---
+export type ServiceCategory =
+  | "AV & Tech"
+  | "Catering"
+  | "Security"
+  | "Cleaning"
+  | "Logistics"
+  | "Electrical";
+export type ContractStatus = "Contracted" | "Pending" | "Cancelled";
+
+export interface ServiceProvider {
+  id: string;
+  name: string;
+  category: ServiceCategory;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  contractStatus: ContractStatus;
+  fee: number;
+  startDate: string;
+}
+
 export const initialVendors: Vendor[] = [
   {
     id: "V001",
@@ -253,3 +310,284 @@ export const analyticsData = {
     { rank: 5, section: "Zone C — West Wing", visitors: 138, percentage: 8 },
   ],
 };
+
+export const initialDocuments: VendorDocument[] = [
+  {
+    id: "D001",
+    vendorId: "V001",
+    vendorName: "Akshay Designs Co.",
+    docType: "Trade License",
+    fileName: "akshay_trade_license_2024.pdf",
+    uploadedAt: "2026-03-01",
+    status: "Verified",
+  },
+  {
+    id: "D002",
+    vendorId: "V001",
+    vendorName: "Akshay Designs Co.",
+    docType: "ID Proof",
+    fileName: "akshay_id_proof.jpg",
+    uploadedAt: "2026-03-01",
+    status: "Verified",
+  },
+  {
+    id: "D003",
+    vendorId: "V002",
+    vendorName: "TechNova Exhibits",
+    docType: "Trade License",
+    fileName: "technova_license.pdf",
+    uploadedAt: "2026-03-03",
+    status: "Verified",
+  },
+  {
+    id: "D004",
+    vendorId: "V002",
+    vendorName: "TechNova Exhibits",
+    docType: "Insurance",
+    fileName: "technova_insurance_cert.pdf",
+    uploadedAt: "2026-03-04",
+    status: "Verified",
+  },
+  {
+    id: "D005",
+    vendorId: "V004",
+    vendorName: "Luxora Fashion House",
+    docType: "Trade License",
+    fileName: "luxora_trade_license.pdf",
+    uploadedAt: "2026-03-18",
+    status: "Pending",
+    notes: "Awaiting physical verification",
+  },
+  {
+    id: "D006",
+    vendorId: "V004",
+    vendorName: "Luxora Fashion House",
+    docType: "Health & Safety Cert",
+    fileName: "luxora_health_safety.pdf",
+    uploadedAt: "2026-03-18",
+    status: "Pending",
+  },
+  {
+    id: "D007",
+    vendorId: "V005",
+    vendorName: "SwiftLogix Solutions",
+    docType: "ID Proof",
+    fileName: "swiftlogix_director_id.pdf",
+    uploadedAt: "2026-03-19",
+    status: "Pending",
+  },
+  {
+    id: "D008",
+    vendorId: "V006",
+    vendorName: "Horizon Pharma Ltd.",
+    docType: "Trade License",
+    fileName: "horizon_license_expired.pdf",
+    uploadedAt: "2026-03-10",
+    status: "Rejected",
+    notes: "License expired — renewal required",
+  },
+];
+
+export const initialPayments: Payment[] = [
+  {
+    id: "P001",
+    vendorId: "V001",
+    vendorName: "Akshay Designs Co.",
+    boothId: "A-101",
+    amount: 2500,
+    method: "Bank Transfer",
+    date: "2026-03-05",
+    status: "Paid",
+    invoiceNo: "INV-2026-001",
+  },
+  {
+    id: "P002",
+    vendorId: "V002",
+    vendorName: "TechNova Exhibits",
+    boothId: "B-201",
+    amount: 1500,
+    method: "Card",
+    date: "2026-03-06",
+    status: "Paid",
+    invoiceNo: "INV-2026-002",
+  },
+  {
+    id: "P003",
+    vendorId: "V003",
+    vendorName: "Green Earth Organics",
+    boothId: "A-103",
+    amount: 1500,
+    method: "Cash",
+    date: "2026-03-08",
+    status: "Paid",
+    invoiceNo: "INV-2026-003",
+  },
+  {
+    id: "P004",
+    vendorId: "V004",
+    vendorName: "Luxora Fashion House",
+    boothId: "C-301",
+    amount: 2500,
+    method: "Bank Transfer",
+    date: "2026-03-20",
+    status: "Pending",
+    invoiceNo: "INV-2026-004",
+  },
+  {
+    id: "P005",
+    vendorId: "V005",
+    vendorName: "SwiftLogix Solutions",
+    boothId: "B-205",
+    amount: 1500,
+    method: "Card",
+    date: "2026-03-22",
+    status: "Pending",
+    invoiceNo: "INV-2026-005",
+  },
+  {
+    id: "P006",
+    vendorId: "V003",
+    vendorName: "Green Earth Organics",
+    boothId: "A-106",
+    amount: 1500,
+    method: "Cash",
+    date: "2026-03-01",
+    status: "Overdue",
+    invoiceNo: "INV-2026-006",
+  },
+  {
+    id: "P007",
+    vendorId: "V001",
+    vendorName: "Akshay Designs Co.",
+    boothId: "A-109",
+    amount: 2500,
+    method: "Bank Transfer",
+    date: "2026-03-07",
+    status: "Paid",
+    invoiceNo: "INV-2026-007",
+  },
+  {
+    id: "P008",
+    vendorId: "V006",
+    vendorName: "Horizon Pharma Ltd.",
+    boothId: "C-304",
+    amount: 1500,
+    method: "Cash",
+    date: "2026-03-10",
+    status: "Overdue",
+    invoiceNo: "INV-2026-008",
+  },
+  {
+    id: "P009",
+    vendorId: "V002",
+    vendorName: "TechNova Exhibits",
+    boothId: "B-208",
+    amount: 2500,
+    method: "Card",
+    date: "2026-03-09",
+    status: "Paid",
+    invoiceNo: "INV-2026-009",
+  },
+  {
+    id: "P010",
+    vendorId: "V004",
+    vendorName: "Luxora Fashion House",
+    boothId: "C-307",
+    amount: 1500,
+    method: "Bank Transfer",
+    date: "2026-03-21",
+    status: "Pending",
+    invoiceNo: "INV-2026-010",
+  },
+];
+
+export const initialServiceProviders: ServiceProvider[] = [
+  {
+    id: "SP001",
+    name: "SoundWave AV Solutions",
+    category: "AV & Tech",
+    contactPerson: "Ravi Sharma",
+    email: "ravi@soundwaveav.com",
+    phone: "+91 98111 22333",
+    contractStatus: "Contracted",
+    fee: 85000,
+    startDate: "2026-03-20",
+  },
+  {
+    id: "SP002",
+    name: "Prestige Catering Services",
+    category: "Catering",
+    contactPerson: "Meena Patel",
+    email: "meena@prestigecatering.in",
+    phone: "+91 97222 33444",
+    contractStatus: "Contracted",
+    fee: 120000,
+    startDate: "2026-03-22",
+  },
+  {
+    id: "SP003",
+    name: "ShieldForce Security",
+    category: "Security",
+    contactPerson: "Arjun Nair",
+    email: "arjun@shieldforce.co",
+    phone: "+91 96333 44555",
+    contractStatus: "Contracted",
+    fee: 60000,
+    startDate: "2026-03-24",
+  },
+  {
+    id: "SP004",
+    name: "CleanSweep Facility Mgmt",
+    category: "Cleaning",
+    contactPerson: "Sunita Rao",
+    email: "sunita@cleansweep.in",
+    phone: "+91 95444 55666",
+    contractStatus: "Contracted",
+    fee: 35000,
+    startDate: "2026-03-24",
+  },
+  {
+    id: "SP005",
+    name: "FastMove Logistics",
+    category: "Logistics",
+    contactPerson: "Kiran Desai",
+    email: "kiran@fastmove.io",
+    phone: "+91 94555 66777",
+    contractStatus: "Pending",
+    fee: 45000,
+    startDate: "2026-03-23",
+  },
+  {
+    id: "SP006",
+    name: "BrightVolt Electricals",
+    category: "Electrical",
+    contactPerson: "Deepak Kumar",
+    email: "deepak@brightvolt.in",
+    phone: "+91 93666 77888",
+    contractStatus: "Contracted",
+    fee: 55000,
+    startDate: "2026-03-21",
+  },
+  {
+    id: "SP007",
+    name: "TasteBuds Food Court",
+    category: "Catering",
+    contactPerson: "Priya Singh",
+    email: "priya@tastebuds.co",
+    phone: "+91 92777 88999",
+    contractStatus: "Cancelled",
+    fee: 75000,
+    startDate: "2026-03-20",
+  },
+  {
+    id: "SP008",
+    name: "NetConnect IT Services",
+    category: "AV & Tech",
+    contactPerson: "Vijay Mehta",
+    email: "vijay@netconnect.in",
+    phone: "+91 91888 99000",
+    contractStatus: "Pending",
+    fee: 40000,
+    startDate: "2026-03-22",
+  },
+];

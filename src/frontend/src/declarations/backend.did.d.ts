@@ -10,7 +10,112 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface _SERVICE {}
+export type ApprovalStatus = { 'pending' : null } |
+  { 'approved' : null } |
+  { 'rejected' : null };
+export interface Booth {
+  'id' : BoothId,
+  'timeLimit' : [] | [bigint],
+  'owner' : Principal,
+  'area' : bigint,
+  'name' : string,
+  'businessType' : BoothType,
+  'reservedUntil' : [] | [bigint],
+  'reservedBy' : Reserved,
+  'price' : bigint,
+  'location' : string,
+}
+export type BoothFoodType = { 'organic' : null } |
+  { 'streetFood' : null } |
+  { 'snacks' : null } |
+  { 'foodTrucks' : null } |
+  { 'beverages' : null } |
+  { 'restaurant' : null };
+export type BoothId = bigint;
+export type BoothRetailType = { 'art' : null } |
+  { 'clothing' : null } |
+  { 'traditionalProducts' : null } |
+  { 'sportsEquipment' : null } |
+  { 'handmadeCrafts' : null } |
+  { 'jewelry' : null } |
+  { 'furniture' : null } |
+  { 'stationery' : null } |
+  { 'books' : null } |
+  { 'electronics' : null };
+export type BoothTechType = { 'techHardware' : null } |
+  { 'fintech' : null } |
+  { 'startup' : null } |
+  { 'education' : null } |
+  { 'hardwareRental' : null } |
+  { 'devTools' : null };
+export type BoothType = { 'retail' : BoothRetailType } |
+  { 'other' : string } |
+  { 'food' : BoothFoodType } |
+  { 'tech' : BoothTechType };
+export interface Building {
+  'x' : bigint,
+  'y' : bigint,
+  'id' : bigint,
+  'height' : bigint,
+  'name' : string,
+  'width' : bigint,
+}
+export type Reserved = { 'reserved' : Principal } |
+  { 'unreserved' : null };
+export interface UserApprovalInfo {
+  'status' : ApprovalStatus,
+  'principal' : Principal,
+}
+export interface UserProfile {
+  'name' : string,
+  'businessName' : string,
+  'description' : [] | [string],
+  'email' : [] | [string],
+  'image' : [] | [string],
+  'phone' : [] | [string],
+}
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
+export interface _SERVICE {
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'filterBoothsByType' : ActorMethod<[BoothType], Array<Booth>>,
+  'getBuildingByCoordinates' : ActorMethod<[bigint, bigint], [] | [Building]>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isCallerApproved' : ActorMethod<[], boolean>,
+  'listApprovals' : ActorMethod<[], Array<UserApprovalInfo>>,
+  'requestApproval' : ActorMethod<[], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
+}
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;

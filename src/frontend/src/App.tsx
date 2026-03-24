@@ -9,7 +9,13 @@ import { Toaster } from "@/components/ui/sonner";
 import Analytics from "@/pages/Analytics";
 import BoothMap from "@/pages/BoothMap";
 import Dashboard from "@/pages/Dashboard";
+import Documents from "@/pages/Documents";
+import EventDetails from "@/pages/EventDetails";
+import Login from "@/pages/Login";
+import Payments from "@/pages/Payments";
+import Services from "@/pages/Services";
 import SettingsPage from "@/pages/Settings";
+import UserRegister from "@/pages/UserRegister";
 import Vendors from "@/pages/Vendors";
 import Visitors from "@/pages/Visitors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,12 +32,17 @@ import {
   Activity,
   BarChart2,
   Bell,
+  CalendarDays,
   ChevronDown,
+  CreditCard,
+  FileText,
   LayoutDashboard,
   MapIcon,
   Menu,
   Settings,
+  UserPlus,
   Users,
+  Wrench,
   X,
   Zap,
 } from "lucide-react";
@@ -41,23 +52,38 @@ const queryClient = new QueryClient();
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/event-details", label: "Event Details", icon: CalendarDays },
   { path: "/booth-map", label: "Booth Map", icon: MapIcon },
   { path: "/vendors", label: "Vendors", icon: Users },
   { path: "/visitors", label: "Visitors", icon: Activity },
   { path: "/analytics", label: "Analytics", icon: BarChart2 },
+  { path: "/documents", label: "Documents", icon: FileText },
+  { path: "/payments", label: "Payments", icon: CreditCard },
+  { path: "/services", label: "Services", icon: Wrench },
   { path: "/settings", label: "Settings", icon: Settings },
+  { path: "/user-register", label: "User Register", icon: UserPlus },
 ];
 
 const pageTitles: Record<string, string> = {
   "/": "Dashboard",
+  "/event-details": "Event Details",
   "/booth-map": "Booth Map",
   "/vendors": "Vendor Management",
   "/visitors": "Visitor Monitoring",
   "/analytics": "Analytics & Reports",
+  "/documents": "Document Verification",
+  "/payments": "Payment Tracking",
+  "/services": "Service Providers",
   "/settings": "Settings",
+  "/user-register": "User Registration",
 };
 
-function Layout() {
+interface LayoutProps {
+  onSignOut: () => void;
+  authName: string;
+}
+
+function Layout({ onSignOut, authName }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
   const pageTitle = pageTitles[location.pathname] ?? "ExhibiTrack";
@@ -82,14 +108,14 @@ function Layout() {
         </div>
 
         <nav
-          className="flex-1 py-4 px-2 space-y-1"
+          className="flex-1 py-4 px-2 space-y-1 overflow-y-auto"
           aria-label="Main navigation"
         >
           {navItems.map(({ path, label, icon: Icon }) => (
             <Link
               key={path}
               to={path}
-              data-ocid={`nav.${label.toLowerCase().replace(" ", "_")}.link`}
+              data-ocid={`nav.${label.toLowerCase().replace(/ /g, "_")}.link`}
               activeProps={{
                 className: "bg-teal-dim text-teal border border-teal/20",
               }}
@@ -143,16 +169,20 @@ function Layout() {
                 className="flex items-center gap-2 text-sm font-medium"
               >
                 <div className="w-7 h-7 rounded-full bg-teal-dim border border-teal/30 flex items-center justify-center text-teal text-xs font-bold">
-                  A
+                  {authName?.[0]?.toUpperCase() ?? "A"}
                 </div>
-                <span className="text-foreground">Admin</span>
+                <span className="text-foreground">{authName || "Admin"}</span>
                 <ChevronDown size={14} className="text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem
+                className="text-destructive"
+                onClick={onSignOut}
+                data-ocid="header.signout.button"
+              >
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -179,56 +209,133 @@ function Layout() {
   );
 }
 
-const rootRoute = createRootRoute({ component: Layout });
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/",
-  component: Dashboard,
-});
-const boothMapRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/booth-map",
-  component: BoothMap,
-});
-const vendorsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/vendors",
-  component: Vendors,
-});
-const visitorsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/visitors",
-  component: Visitors,
-});
-const analyticsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/analytics",
-  component: Analytics,
-});
-const settingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/settings",
-  component: SettingsPage,
+const rootRoute = createRootRoute({
+  component: () => <Outlet />,
 });
 
-const routeTree = rootRoute.addChildren([
-  indexRoute,
-  boothMapRoute,
-  vendorsRoute,
-  visitorsRoute,
-  analyticsRoute,
-  settingsRoute,
-]);
+function makeLayoutRoute(onSignOut: () => void, authName: string) {
+  return createRoute({
+    getParentRoute: () => rootRoute,
+    id: "layout",
+    component: () => <Layout onSignOut={onSignOut} authName={authName} />,
+  });
+}
 
-const router = createRouter({ routeTree });
+function buildRouter(onSignOut: () => void, authName: string) {
+  const layoutRoute = makeLayoutRoute(onSignOut, authName);
 
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
+  const indexRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/",
+    component: Dashboard,
+  });
+  const eventDetailsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/event-details",
+    component: EventDetails,
+  });
+  const boothMapRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/booth-map",
+    component: BoothMap,
+  });
+  const vendorsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/vendors",
+    component: Vendors,
+  });
+  const visitorsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/visitors",
+    component: Visitors,
+  });
+  const analyticsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/analytics",
+    component: Analytics,
+  });
+  const settingsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/settings",
+    component: SettingsPage,
+  });
+  const documentsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/documents",
+    component: Documents,
+  });
+  const paymentsRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/payments",
+    component: Payments,
+  });
+  const servicesRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/services",
+    component: Services,
+  });
+  const userRegisterRoute = createRoute({
+    getParentRoute: () => layoutRoute,
+    path: "/user-register",
+    component: UserRegister,
+  });
+
+  const routeTree = rootRoute.addChildren([
+    layoutRoute.addChildren([
+      indexRoute,
+      eventDetailsRoute,
+      boothMapRoute,
+      vendorsRoute,
+      visitorsRoute,
+      analyticsRoute,
+      settingsRoute,
+      documentsRoute,
+      paymentsRoute,
+      servicesRoute,
+      userRegisterRoute,
+    ]),
+  ]);
+
+  return createRouter({ routeTree });
 }
 
 export default function App() {
+  const [auth, setAuth] = useState<{ role: string; name: string } | null>(
+    () => {
+      try {
+        const stored = localStorage.getItem("exhibitrack_auth");
+        return stored ? JSON.parse(stored) : null;
+      } catch {
+        return null;
+      }
+    },
+  );
+
+  function handleLogin(role: "admin" | "user") {
+    try {
+      const stored = localStorage.getItem("exhibitrack_auth");
+      if (stored) setAuth(JSON.parse(stored));
+    } catch {
+      setAuth({ role, name: role === "admin" ? "Rajesh Kumar" : "User" });
+    }
+  }
+
+  function handleSignOut() {
+    localStorage.removeItem("exhibitrack_auth");
+    setAuth(null);
+  }
+
+  if (!auth) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Login onLogin={handleLogin} />
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
+
+  const router = buildRouter(handleSignOut, auth.name);
+
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />

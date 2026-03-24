@@ -8,10 +8,282 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const idlService = IDL.Service({});
+export const _CaffeineStorageCreateCertificateResult = IDL.Record({
+  'method' : IDL.Text,
+  'blob_hash' : IDL.Text,
+});
+export const _CaffeineStorageRefillInformation = IDL.Record({
+  'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const _CaffeineStorageRefillResult = IDL.Record({
+  'success' : IDL.Opt(IDL.Bool),
+  'topped_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const UserRole = IDL.Variant({
+  'admin' : IDL.Null,
+  'user' : IDL.Null,
+  'guest' : IDL.Null,
+});
+export const BoothRetailType = IDL.Variant({
+  'art' : IDL.Null,
+  'clothing' : IDL.Null,
+  'traditionalProducts' : IDL.Null,
+  'sportsEquipment' : IDL.Null,
+  'handmadeCrafts' : IDL.Null,
+  'jewelry' : IDL.Null,
+  'furniture' : IDL.Null,
+  'stationery' : IDL.Null,
+  'books' : IDL.Null,
+  'electronics' : IDL.Null,
+});
+export const BoothFoodType = IDL.Variant({
+  'organic' : IDL.Null,
+  'streetFood' : IDL.Null,
+  'snacks' : IDL.Null,
+  'foodTrucks' : IDL.Null,
+  'beverages' : IDL.Null,
+  'restaurant' : IDL.Null,
+});
+export const BoothTechType = IDL.Variant({
+  'techHardware' : IDL.Null,
+  'fintech' : IDL.Null,
+  'startup' : IDL.Null,
+  'education' : IDL.Null,
+  'hardwareRental' : IDL.Null,
+  'devTools' : IDL.Null,
+});
+export const BoothType = IDL.Variant({
+  'retail' : BoothRetailType,
+  'other' : IDL.Text,
+  'food' : BoothFoodType,
+  'tech' : BoothTechType,
+});
+export const BoothId = IDL.Nat;
+export const Reserved = IDL.Variant({
+  'reserved' : IDL.Principal,
+  'unreserved' : IDL.Null,
+});
+export const Booth = IDL.Record({
+  'id' : BoothId,
+  'timeLimit' : IDL.Opt(IDL.Int),
+  'owner' : IDL.Principal,
+  'area' : IDL.Nat,
+  'name' : IDL.Text,
+  'businessType' : BoothType,
+  'reservedUntil' : IDL.Opt(IDL.Int),
+  'reservedBy' : Reserved,
+  'price' : IDL.Nat,
+  'location' : IDL.Text,
+});
+export const Building = IDL.Record({
+  'x' : IDL.Nat,
+  'y' : IDL.Nat,
+  'id' : IDL.Nat,
+  'height' : IDL.Nat,
+  'name' : IDL.Text,
+  'width' : IDL.Nat,
+});
+export const ApprovalStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'approved' : IDL.Null,
+  'rejected' : IDL.Null,
+});
+export const UserApprovalInfo = IDL.Record({
+  'status' : ApprovalStatus,
+  'principal' : IDL.Principal,
+});
+export const UserProfile = IDL.Record({
+  'name' : IDL.Text,
+  'businessName' : IDL.Text,
+  'description' : IDL.Opt(IDL.Text),
+  'email' : IDL.Opt(IDL.Text),
+  'image' : IDL.Opt(IDL.Text),
+  'phone' : IDL.Opt(IDL.Text),
+});
+
+export const idlService = IDL.Service({
+  '_caffeineStorageBlobIsLive' : IDL.Func(
+      [IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      ['query'],
+    ),
+  '_caffeineStorageBlobsToDelete' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      ['query'],
+    ),
+  '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      [],
+      [],
+    ),
+  '_caffeineStorageCreateCertificate' : IDL.Func(
+      [IDL.Text],
+      [_CaffeineStorageCreateCertificateResult],
+      [],
+    ),
+  '_caffeineStorageRefillCashier' : IDL.Func(
+      [IDL.Opt(_CaffeineStorageRefillInformation)],
+      [_CaffeineStorageRefillResult],
+      [],
+    ),
+  '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
+  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'filterBoothsByType' : IDL.Func([BoothType], [IDL.Vec(Booth)], ['query']),
+  'getBuildingByCoordinates' : IDL.Func(
+      [IDL.Nat, IDL.Nat],
+      [IDL.Opt(Building)],
+      ['query'],
+    ),
+  'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isCallerApproved' : IDL.Func([], [IDL.Bool], ['query']),
+  'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
+  'requestApproval' : IDL.Func([], [], []),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
+});
 
 export const idlInitArgs = [];
 
-export const idlFactory = ({ IDL }) => { return IDL.Service({}); };
+export const idlFactory = ({ IDL }) => {
+  const _CaffeineStorageCreateCertificateResult = IDL.Record({
+    'method' : IDL.Text,
+    'blob_hash' : IDL.Text,
+  });
+  const _CaffeineStorageRefillInformation = IDL.Record({
+    'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const _CaffeineStorageRefillResult = IDL.Record({
+    'success' : IDL.Opt(IDL.Bool),
+    'topped_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
+  const BoothRetailType = IDL.Variant({
+    'art' : IDL.Null,
+    'clothing' : IDL.Null,
+    'traditionalProducts' : IDL.Null,
+    'sportsEquipment' : IDL.Null,
+    'handmadeCrafts' : IDL.Null,
+    'jewelry' : IDL.Null,
+    'furniture' : IDL.Null,
+    'stationery' : IDL.Null,
+    'books' : IDL.Null,
+    'electronics' : IDL.Null,
+  });
+  const BoothFoodType = IDL.Variant({
+    'organic' : IDL.Null,
+    'streetFood' : IDL.Null,
+    'snacks' : IDL.Null,
+    'foodTrucks' : IDL.Null,
+    'beverages' : IDL.Null,
+    'restaurant' : IDL.Null,
+  });
+  const BoothTechType = IDL.Variant({
+    'techHardware' : IDL.Null,
+    'fintech' : IDL.Null,
+    'startup' : IDL.Null,
+    'education' : IDL.Null,
+    'hardwareRental' : IDL.Null,
+    'devTools' : IDL.Null,
+  });
+  const BoothType = IDL.Variant({
+    'retail' : BoothRetailType,
+    'other' : IDL.Text,
+    'food' : BoothFoodType,
+    'tech' : BoothTechType,
+  });
+  const BoothId = IDL.Nat;
+  const Reserved = IDL.Variant({
+    'reserved' : IDL.Principal,
+    'unreserved' : IDL.Null,
+  });
+  const Booth = IDL.Record({
+    'id' : BoothId,
+    'timeLimit' : IDL.Opt(IDL.Int),
+    'owner' : IDL.Principal,
+    'area' : IDL.Nat,
+    'name' : IDL.Text,
+    'businessType' : BoothType,
+    'reservedUntil' : IDL.Opt(IDL.Int),
+    'reservedBy' : Reserved,
+    'price' : IDL.Nat,
+    'location' : IDL.Text,
+  });
+  const Building = IDL.Record({
+    'x' : IDL.Nat,
+    'y' : IDL.Nat,
+    'id' : IDL.Nat,
+    'height' : IDL.Nat,
+    'name' : IDL.Text,
+    'width' : IDL.Nat,
+  });
+  const ApprovalStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
+  const UserApprovalInfo = IDL.Record({
+    'status' : ApprovalStatus,
+    'principal' : IDL.Principal,
+  });
+  const UserProfile = IDL.Record({
+    'name' : IDL.Text,
+    'businessName' : IDL.Text,
+    'description' : IDL.Opt(IDL.Text),
+    'email' : IDL.Opt(IDL.Text),
+    'image' : IDL.Opt(IDL.Text),
+    'phone' : IDL.Opt(IDL.Text),
+  });
+  
+  return IDL.Service({
+    '_caffeineStorageBlobIsLive' : IDL.Func(
+        [IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        ['query'],
+      ),
+    '_caffeineStorageBlobsToDelete' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        [],
+        [],
+      ),
+    '_caffeineStorageCreateCertificate' : IDL.Func(
+        [IDL.Text],
+        [_CaffeineStorageCreateCertificateResult],
+        [],
+      ),
+    '_caffeineStorageRefillCashier' : IDL.Func(
+        [IDL.Opt(_CaffeineStorageRefillInformation)],
+        [_CaffeineStorageRefillResult],
+        [],
+      ),
+    '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'filterBoothsByType' : IDL.Func([BoothType], [IDL.Vec(Booth)], ['query']),
+    'getBuildingByCoordinates' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Opt(Building)],
+        ['query'],
+      ),
+    'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isCallerApproved' : IDL.Func([], [IDL.Bool], ['query']),
+    'listApprovals' : IDL.Func([], [IDL.Vec(UserApprovalInfo)], ['query']),
+    'requestApproval' : IDL.Func([], [], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
+  });
+};
 
 export const init = ({ IDL }) => { return []; };

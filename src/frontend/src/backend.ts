@@ -89,10 +89,819 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface backendInterface {
+export interface _CaffeineStorageRefillResult {
+    success?: boolean;
+    topped_up_amount?: bigint;
 }
+export interface Building {
+    x: bigint;
+    y: bigint;
+    id: bigint;
+    height: bigint;
+    name: string;
+    width: bigint;
+}
+export interface _CaffeineStorageRefillInformation {
+    proposed_top_up_amount?: bigint;
+}
+export type BoothId = bigint;
+export interface _CaffeineStorageCreateCertificateResult {
+    method: string;
+    blob_hash: string;
+}
+export interface Booth {
+    id: BoothId;
+    timeLimit?: bigint;
+    owner: Principal;
+    area: bigint;
+    name: string;
+    businessType: BoothType;
+    reservedUntil?: bigint;
+    reservedBy: Reserved;
+    price: bigint;
+    location: string;
+}
+export interface UserApprovalInfo {
+    status: ApprovalStatus;
+    principal: Principal;
+}
+export type Reserved = {
+    __kind__: "reserved";
+    reserved: Principal;
+} | {
+    __kind__: "unreserved";
+    unreserved: null;
+};
+export interface UserProfile {
+    name: string;
+    businessName: string;
+    description?: string;
+    email?: string;
+    image?: string;
+    phone?: string;
+}
+export type BoothType = {
+    __kind__: "retail";
+    retail: BoothRetailType;
+} | {
+    __kind__: "other";
+    other: string;
+} | {
+    __kind__: "food";
+    food: BoothFoodType;
+} | {
+    __kind__: "tech";
+    tech: BoothTechType;
+};
+export enum ApprovalStatus {
+    pending = "pending",
+    approved = "approved",
+    rejected = "rejected"
+}
+export enum BoothFoodType {
+    organic = "organic",
+    streetFood = "streetFood",
+    snacks = "snacks",
+    foodTrucks = "foodTrucks",
+    beverages = "beverages",
+    restaurant = "restaurant"
+}
+export enum BoothRetailType {
+    art = "art",
+    clothing = "clothing",
+    traditionalProducts = "traditionalProducts",
+    sportsEquipment = "sportsEquipment",
+    handmadeCrafts = "handmadeCrafts",
+    jewelry = "jewelry",
+    furniture = "furniture",
+    stationery = "stationery",
+    books = "books",
+    electronics = "electronics"
+}
+export enum BoothTechType {
+    techHardware = "techHardware",
+    fintech = "fintech",
+    startup = "startup",
+    education = "education",
+    hardwareRental = "hardwareRental",
+    devTools = "devTools"
+}
+export enum UserRole {
+    admin = "admin",
+    user = "user",
+    guest = "guest"
+}
+export interface backendInterface {
+    _caffeineStorageBlobIsLive(hash: Uint8Array): Promise<boolean>;
+    _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>>;
+    _caffeineStorageConfirmBlobDeletion(blobs: Array<Uint8Array>): Promise<void>;
+    _caffeineStorageCreateCertificate(blobHash: string): Promise<_CaffeineStorageCreateCertificateResult>;
+    _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
+    _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
+    _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    filterBoothsByType(boothType: BoothType): Promise<Array<Booth>>;
+    getBuildingByCoordinates(x: bigint, y: bigint): Promise<Building | null>;
+    getCallerUserRole(): Promise<UserRole>;
+    isCallerAdmin(): Promise<boolean>;
+    isCallerApproved(): Promise<boolean>;
+    listApprovals(): Promise<Array<UserApprovalInfo>>;
+    requestApproval(): Promise<void>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    setApproval(user: Principal, status: ApprovalStatus): Promise<void>;
+}
+import type { ApprovalStatus as _ApprovalStatus, Booth as _Booth, BoothFoodType as _BoothFoodType, BoothId as _BoothId, BoothRetailType as _BoothRetailType, BoothTechType as _BoothTechType, BoothType as _BoothType, Building as _Building, Reserved as _Reserved, UserApprovalInfo as _UserApprovalInfo, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageBlobIsLive(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageBlobIsLive(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageBlobsToDelete();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageBlobsToDelete();
+            return result;
+        }
+    }
+    async _caffeineStorageConfirmBlobDeletion(arg0: Array<Uint8Array>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageCreateCertificate(arg0: string): Promise<_CaffeineStorageCreateCertificateResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageRefillCashier(arg0: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+                return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+            return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async _caffeineStorageUpdateGatewayPrincipals(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+            return result;
+        }
+    }
+    async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._initializeAccessControlWithSecret(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._initializeAccessControlWithSecret(arg0);
+            return result;
+        }
+    }
+    async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async filterBoothsByType(arg0: BoothType): Promise<Array<Booth>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.filterBoothsByType(to_candid_BoothType_n10(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n18(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.filterBoothsByType(to_candid_BoothType_n10(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n18(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getBuildingByCoordinates(arg0: bigint, arg1: bigint): Promise<Building | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getBuildingByCoordinates(arg0, arg1);
+                return from_candid_opt_n32(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getBuildingByCoordinates(arg0, arg1);
+            return from_candid_opt_n32(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getCallerUserRole(): Promise<UserRole> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserRole();
+                return from_candid_UserRole_n33(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserRole();
+            return from_candid_UserRole_n33(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async isCallerAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isCallerAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isCallerAdmin();
+            return result;
+        }
+    }
+    async isCallerApproved(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isCallerApproved();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isCallerApproved();
+            return result;
+        }
+    }
+    async listApprovals(): Promise<Array<UserApprovalInfo>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.listApprovals();
+                return from_candid_vec_n35(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.listApprovals();
+            return from_candid_vec_n35(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async requestApproval(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.requestApproval();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.requestApproval();
+            return result;
+        }
+    }
+    async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n40(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n40(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async setApproval(arg0: Principal, arg1: ApprovalStatus): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.setApproval(arg0, to_candid_ApprovalStatus_n42(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.setApproval(arg0, to_candid_ApprovalStatus_n42(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+}
+function from_candid_ApprovalStatus_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ApprovalStatus): ApprovalStatus {
+    return from_candid_variant_n39(_uploadFile, _downloadFile, value);
+}
+function from_candid_BoothFoodType_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BoothFoodType): BoothFoodType {
+    return from_candid_variant_n27(_uploadFile, _downloadFile, value);
+}
+function from_candid_BoothRetailType_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BoothRetailType): BoothRetailType {
+    return from_candid_variant_n25(_uploadFile, _downloadFile, value);
+}
+function from_candid_BoothTechType_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BoothTechType): BoothTechType {
+    return from_candid_variant_n29(_uploadFile, _downloadFile, value);
+}
+function from_candid_BoothType_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _BoothType): BoothType {
+    return from_candid_variant_n23(_uploadFile, _downloadFile, value);
+}
+function from_candid_Booth_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Booth): Booth {
+    return from_candid_record_n20(_uploadFile, _downloadFile, value);
+}
+function from_candid_Reserved_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Reserved): Reserved {
+    return from_candid_variant_n31(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserApprovalInfo_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserApprovalInfo): UserApprovalInfo {
+    return from_candid_record_n37(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n34(_uploadFile, _downloadFile, value);
+}
+function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Building]): Building | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: _BoothId;
+    timeLimit: [] | [bigint];
+    owner: Principal;
+    area: bigint;
+    name: string;
+    businessType: _BoothType;
+    reservedUntil: [] | [bigint];
+    reservedBy: _Reserved;
+    price: bigint;
+    location: string;
+}): {
+    id: BoothId;
+    timeLimit?: bigint;
+    owner: Principal;
+    area: bigint;
+    name: string;
+    businessType: BoothType;
+    reservedUntil?: bigint;
+    reservedBy: Reserved;
+    price: bigint;
+    location: string;
+} {
+    return {
+        id: value.id,
+        timeLimit: record_opt_to_undefined(from_candid_opt_n21(_uploadFile, _downloadFile, value.timeLimit)),
+        owner: value.owner,
+        area: value.area,
+        name: value.name,
+        businessType: from_candid_BoothType_n22(_uploadFile, _downloadFile, value.businessType),
+        reservedUntil: record_opt_to_undefined(from_candid_opt_n21(_uploadFile, _downloadFile, value.reservedUntil)),
+        reservedBy: from_candid_Reserved_n30(_uploadFile, _downloadFile, value.reservedBy),
+        price: value.price,
+        location: value.location
+    };
+}
+function from_candid_record_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    status: _ApprovalStatus;
+    principal: Principal;
+}): {
+    status: ApprovalStatus;
+    principal: Principal;
+} {
+    return {
+        status: from_candid_ApprovalStatus_n38(_uploadFile, _downloadFile, value.status),
+        principal: value.principal
+    };
+}
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    success: [] | [boolean];
+    topped_up_amount: [] | [bigint];
+}): {
+    success?: boolean;
+    topped_up_amount?: bigint;
+} {
+    return {
+        success: record_opt_to_undefined(from_candid_opt_n6(_uploadFile, _downloadFile, value.success)),
+        topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
+    };
+}
+function from_candid_variant_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    retail: _BoothRetailType;
+} | {
+    other: string;
+} | {
+    food: _BoothFoodType;
+} | {
+    tech: _BoothTechType;
+}): {
+    __kind__: "retail";
+    retail: BoothRetailType;
+} | {
+    __kind__: "other";
+    other: string;
+} | {
+    __kind__: "food";
+    food: BoothFoodType;
+} | {
+    __kind__: "tech";
+    tech: BoothTechType;
+} {
+    return "retail" in value ? {
+        __kind__: "retail",
+        retail: from_candid_BoothRetailType_n24(_uploadFile, _downloadFile, value.retail)
+    } : "other" in value ? {
+        __kind__: "other",
+        other: value.other
+    } : "food" in value ? {
+        __kind__: "food",
+        food: from_candid_BoothFoodType_n26(_uploadFile, _downloadFile, value.food)
+    } : "tech" in value ? {
+        __kind__: "tech",
+        tech: from_candid_BoothTechType_n28(_uploadFile, _downloadFile, value.tech)
+    } : value;
+}
+function from_candid_variant_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    art: null;
+} | {
+    clothing: null;
+} | {
+    traditionalProducts: null;
+} | {
+    sportsEquipment: null;
+} | {
+    handmadeCrafts: null;
+} | {
+    jewelry: null;
+} | {
+    furniture: null;
+} | {
+    stationery: null;
+} | {
+    books: null;
+} | {
+    electronics: null;
+}): BoothRetailType {
+    return "art" in value ? BoothRetailType.art : "clothing" in value ? BoothRetailType.clothing : "traditionalProducts" in value ? BoothRetailType.traditionalProducts : "sportsEquipment" in value ? BoothRetailType.sportsEquipment : "handmadeCrafts" in value ? BoothRetailType.handmadeCrafts : "jewelry" in value ? BoothRetailType.jewelry : "furniture" in value ? BoothRetailType.furniture : "stationery" in value ? BoothRetailType.stationery : "books" in value ? BoothRetailType.books : "electronics" in value ? BoothRetailType.electronics : value;
+}
+function from_candid_variant_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    organic: null;
+} | {
+    streetFood: null;
+} | {
+    snacks: null;
+} | {
+    foodTrucks: null;
+} | {
+    beverages: null;
+} | {
+    restaurant: null;
+}): BoothFoodType {
+    return "organic" in value ? BoothFoodType.organic : "streetFood" in value ? BoothFoodType.streetFood : "snacks" in value ? BoothFoodType.snacks : "foodTrucks" in value ? BoothFoodType.foodTrucks : "beverages" in value ? BoothFoodType.beverages : "restaurant" in value ? BoothFoodType.restaurant : value;
+}
+function from_candid_variant_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    techHardware: null;
+} | {
+    fintech: null;
+} | {
+    startup: null;
+} | {
+    education: null;
+} | {
+    hardwareRental: null;
+} | {
+    devTools: null;
+}): BoothTechType {
+    return "techHardware" in value ? BoothTechType.techHardware : "fintech" in value ? BoothTechType.fintech : "startup" in value ? BoothTechType.startup : "education" in value ? BoothTechType.education : "hardwareRental" in value ? BoothTechType.hardwareRental : "devTools" in value ? BoothTechType.devTools : value;
+}
+function from_candid_variant_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    reserved: Principal;
+} | {
+    unreserved: null;
+}): {
+    __kind__: "reserved";
+    reserved: Principal;
+} | {
+    __kind__: "unreserved";
+    unreserved: null;
+} {
+    return "reserved" in value ? {
+        __kind__: "reserved",
+        reserved: value.reserved
+    } : "unreserved" in value ? {
+        __kind__: "unreserved",
+        unreserved: value.unreserved
+    } : value;
+}
+function from_candid_variant_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+}): UserRole {
+    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+}
+function from_candid_variant_n39(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    pending: null;
+} | {
+    approved: null;
+} | {
+    rejected: null;
+}): ApprovalStatus {
+    return "pending" in value ? ApprovalStatus.pending : "approved" in value ? ApprovalStatus.approved : "rejected" in value ? ApprovalStatus.rejected : value;
+}
+function from_candid_vec_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Booth>): Array<Booth> {
+    return value.map((x)=>from_candid_Booth_n19(_uploadFile, _downloadFile, x));
+}
+function from_candid_vec_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_UserApprovalInfo>): Array<UserApprovalInfo> {
+    return value.map((x)=>from_candid_UserApprovalInfo_n36(_uploadFile, _downloadFile, x));
+}
+function to_candid_ApprovalStatus_n42(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ApprovalStatus): _ApprovalStatus {
+    return to_candid_variant_n43(_uploadFile, _downloadFile, value);
+}
+function to_candid_BoothFoodType_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BoothFoodType): _BoothFoodType {
+    return to_candid_variant_n15(_uploadFile, _downloadFile, value);
+}
+function to_candid_BoothRetailType_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BoothRetailType): _BoothRetailType {
+    return to_candid_variant_n17(_uploadFile, _downloadFile, value);
+}
+function to_candid_BoothTechType_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BoothTechType): _BoothTechType {
+    return to_candid_variant_n13(_uploadFile, _downloadFile, value);
+}
+function to_candid_BoothType_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BoothType): _BoothType {
+    return to_candid_variant_n11(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserProfile_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
+    return to_candid_record_n41(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n9(_uploadFile, _downloadFile, value);
+}
+function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
+    return to_candid_record_n3(_uploadFile, _downloadFile, value);
+}
+function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
+    return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
+}
+function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    proposed_top_up_amount?: bigint;
+}): {
+    proposed_top_up_amount: [] | [bigint];
+} {
+    return {
+        proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
+    };
+}
+function to_candid_record_n41(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    name: string;
+    businessName: string;
+    description?: string;
+    email?: string;
+    image?: string;
+    phone?: string;
+}): {
+    name: string;
+    businessName: string;
+    description: [] | [string];
+    email: [] | [string];
+    image: [] | [string];
+    phone: [] | [string];
+} {
+    return {
+        name: value.name,
+        businessName: value.businessName,
+        description: value.description ? candid_some(value.description) : candid_none(),
+        email: value.email ? candid_some(value.email) : candid_none(),
+        image: value.image ? candid_some(value.image) : candid_none(),
+        phone: value.phone ? candid_some(value.phone) : candid_none()
+    };
+}
+function to_candid_variant_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    __kind__: "retail";
+    retail: BoothRetailType;
+} | {
+    __kind__: "other";
+    other: string;
+} | {
+    __kind__: "food";
+    food: BoothFoodType;
+} | {
+    __kind__: "tech";
+    tech: BoothTechType;
+}): {
+    retail: _BoothRetailType;
+} | {
+    other: string;
+} | {
+    food: _BoothFoodType;
+} | {
+    tech: _BoothTechType;
+} {
+    return value.__kind__ === "retail" ? {
+        retail: to_candid_BoothRetailType_n16(_uploadFile, _downloadFile, value.retail)
+    } : value.__kind__ === "other" ? {
+        other: value.other
+    } : value.__kind__ === "food" ? {
+        food: to_candid_BoothFoodType_n14(_uploadFile, _downloadFile, value.food)
+    } : value.__kind__ === "tech" ? {
+        tech: to_candid_BoothTechType_n12(_uploadFile, _downloadFile, value.tech)
+    } : value;
+}
+function to_candid_variant_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BoothTechType): {
+    techHardware: null;
+} | {
+    fintech: null;
+} | {
+    startup: null;
+} | {
+    education: null;
+} | {
+    hardwareRental: null;
+} | {
+    devTools: null;
+} {
+    return value == BoothTechType.techHardware ? {
+        techHardware: null
+    } : value == BoothTechType.fintech ? {
+        fintech: null
+    } : value == BoothTechType.startup ? {
+        startup: null
+    } : value == BoothTechType.education ? {
+        education: null
+    } : value == BoothTechType.hardwareRental ? {
+        hardwareRental: null
+    } : value == BoothTechType.devTools ? {
+        devTools: null
+    } : value;
+}
+function to_candid_variant_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BoothFoodType): {
+    organic: null;
+} | {
+    streetFood: null;
+} | {
+    snacks: null;
+} | {
+    foodTrucks: null;
+} | {
+    beverages: null;
+} | {
+    restaurant: null;
+} {
+    return value == BoothFoodType.organic ? {
+        organic: null
+    } : value == BoothFoodType.streetFood ? {
+        streetFood: null
+    } : value == BoothFoodType.snacks ? {
+        snacks: null
+    } : value == BoothFoodType.foodTrucks ? {
+        foodTrucks: null
+    } : value == BoothFoodType.beverages ? {
+        beverages: null
+    } : value == BoothFoodType.restaurant ? {
+        restaurant: null
+    } : value;
+}
+function to_candid_variant_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: BoothRetailType): {
+    art: null;
+} | {
+    clothing: null;
+} | {
+    traditionalProducts: null;
+} | {
+    sportsEquipment: null;
+} | {
+    handmadeCrafts: null;
+} | {
+    jewelry: null;
+} | {
+    furniture: null;
+} | {
+    stationery: null;
+} | {
+    books: null;
+} | {
+    electronics: null;
+} {
+    return value == BoothRetailType.art ? {
+        art: null
+    } : value == BoothRetailType.clothing ? {
+        clothing: null
+    } : value == BoothRetailType.traditionalProducts ? {
+        traditionalProducts: null
+    } : value == BoothRetailType.sportsEquipment ? {
+        sportsEquipment: null
+    } : value == BoothRetailType.handmadeCrafts ? {
+        handmadeCrafts: null
+    } : value == BoothRetailType.jewelry ? {
+        jewelry: null
+    } : value == BoothRetailType.furniture ? {
+        furniture: null
+    } : value == BoothRetailType.stationery ? {
+        stationery: null
+    } : value == BoothRetailType.books ? {
+        books: null
+    } : value == BoothRetailType.electronics ? {
+        electronics: null
+    } : value;
+}
+function to_candid_variant_n43(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ApprovalStatus): {
+    pending: null;
+} | {
+    approved: null;
+} | {
+    rejected: null;
+} {
+    return value == ApprovalStatus.pending ? {
+        pending: null
+    } : value == ApprovalStatus.approved ? {
+        approved: null
+    } : value == ApprovalStatus.rejected ? {
+        rejected: null
+    } : value;
+}
+function to_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+} {
+    return value == UserRole.admin ? {
+        admin: null
+    } : value == UserRole.user ? {
+        user: null
+    } : value == UserRole.guest ? {
+        guest: null
+    } : value;
 }
 export interface CreateActorOptions {
     agent?: Agent;

@@ -27,13 +27,7 @@ export function useActor() {
 
       const actor = await createActorWithConfig(actorOptions);
       const adminToken = getSecretParameter("caffeineAdminToken") || "";
-      // Call initialization method if it exists on the actor
-      const actorWithInit = actor as backendInterface & {
-        _initializeAccessControlWithSecret?: (token: string) => Promise<void>;
-      };
-      if (actorWithInit._initializeAccessControlWithSecret) {
-        await actorWithInit._initializeAccessControlWithSecret(adminToken);
-      }
+      await actor._initializeAccessControlWithSecret(adminToken);
       return actor;
     },
     // Only refetch when identity changes
