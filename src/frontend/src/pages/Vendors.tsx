@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -23,16 +24,21 @@ import {
   type VendorStatus,
   initialVendors,
 } from "@/data/mockData";
+import { useActor } from "@/hooks/useActor";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle,
   Clock,
   Plus,
   Search,
   Upload,
+  UserCheck,
   XCircle,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { ApprovalStatus } from "../backend";
 
 const statusBadge: Record<VendorStatus, string> = {
   Pending: "bg-status-pending/20 text-status-pending border-status-pending/30",
@@ -49,6 +55,8 @@ const statusIcon: Record<VendorStatus, typeof CheckCircle> = {
 };
 
 export default function Vendors() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const qc = useQueryClient();
   const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -60,6 +68,49 @@ export default function Vendors() {
     licenseNumber: "",
   });
 
+  // ── Backend: list approvals ───────────────────────────────────────────────
+  const approvalsQuery = useQuery({
+    queryKey: ["approvals"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.listApprovals();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+
+  const pendingApprovals = (approvalsQuery.data ?? []).filter(
+    (a) => a.status === ApprovalStatus.pending,
+  );
+
+  const approveMutation = useMutation({
+    mutationFn: async (
+      principal: import("@icp-sdk/core/principal").Principal,
+    ) => {
+      if (!actor) throw new Error("Not connected");
+      await actor.setApproval(principal, ApprovalStatus.approved);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["approvals"] });
+      toast.success("User approved successfully");
+    },
+    onError: () => toast.error("Failed to approve user"),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (
+      principal: import("@icp-sdk/core/principal").Principal,
+    ) => {
+      if (!actor) throw new Error("Not connected");
+      await actor.setApproval(principal, ApprovalStatus.rejected);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["approvals"] });
+      toast.success("User rejected");
+    },
+    onError: () => toast.error("Failed to reject user"),
+  });
+
+  // ── Local vendor management (mock data) ──────────────────────────────────
   function approve(id: string) {
     setVendors((prev) =>
       prev.map((v) =>
@@ -138,6 +189,116 @@ export default function Vendors() {
           </motion.div>
         ))}
       </div>
+
+      {/* Pending User Approvals */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-card rounded-xl border border-border shadow-card"
+      >
+        <div className="px-5 py-4 border-b border-border flex items-center gap-3">
+          <UserCheck className="w-4 h-4 text-teal" />
+          <h2 className="text-sm font-semibold flex-1">
+            Pending User Approvals
+          </h2>
+          {approvalsQuery.isLoading ? (
+            <Skeleton className="h-4 w-16" />
+          ) : (
+            <Badge
+              variant="outline"
+              className="border-status-pending/30 text-status-pending bg-status-pending/10 text-xs"
+            >
+              {pendingApprovals.length} pending
+            </Badge>
+          )}
+        </div>
+
+        {approvalsQuery.isLoading ? (
+          <div
+            className="p-5 space-y-3"
+            data-ocid="vendors.approvals.loading_state"
+          >
+            {[1, 2].map((i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
+        ) : pendingApprovals.length === 0 ? (
+          <div
+            className="py-10 text-center text-sm text-muted-foreground"
+            data-ocid="vendors.approvals.empty_state"
+          >
+            No pending user approvals.
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground text-xs">
+                  Principal ID
+                </TableHead>
+                <TableHead className="text-muted-foreground text-xs">
+                  Status
+                </TableHead>
+                <TableHead className="text-muted-foreground text-xs">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pendingApprovals.map((approval, idx) => (
+                <TableRow
+                  key={approval.principal.toString()}
+                  className="border-border hover:bg-secondary/30 transition-colors"
+                  data-ocid={`vendors.approvals.item.${idx + 1}`}
+                >
+                  <TableCell className="text-xs font-mono text-muted-foreground max-w-xs truncate">
+                    {approval.principal.toString()}
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-status-pending/20 text-status-pending border-status-pending/30">
+                      <Clock size={10} />
+                      Pending
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs bg-status-verified/20 text-status-verified hover:bg-status-verified/30 border border-status-verified/30"
+                        variant="outline"
+                        disabled={
+                          approveMutation.isPending || rejectMutation.isPending
+                        }
+                        onClick={() =>
+                          approveMutation.mutate(approval.principal)
+                        }
+                        data-ocid={`vendors.approvals.approve.button.${idx + 1}`}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs bg-status-rejected/20 text-status-rejected hover:bg-status-rejected/30 border border-status-rejected/30"
+                        variant="outline"
+                        disabled={
+                          approveMutation.isPending || rejectMutation.isPending
+                        }
+                        onClick={() =>
+                          rejectMutation.mutate(approval.principal)
+                        }
+                        data-ocid={`vendors.approvals.reject.button.${idx + 1}`}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </motion.div>
 
       {/* Table card */}
       <div className="bg-card rounded-xl border border-border shadow-card">

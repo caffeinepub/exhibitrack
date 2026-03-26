@@ -1,3 +1,4 @@
+import UserLayout from "@/components/UserLayout";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,9 +16,14 @@ import Login from "@/pages/Login";
 import Payments from "@/pages/Payments";
 import Services from "@/pages/Services";
 import SettingsPage from "@/pages/Settings";
-import UserRegister from "@/pages/UserRegister";
 import Vendors from "@/pages/Vendors";
 import Visitors from "@/pages/Visitors";
+import UserBoothApply from "@/pages/user/UserBoothApply";
+import UserDashboard from "@/pages/user/UserDashboard";
+import UserDocuments from "@/pages/user/UserDocuments";
+import UserPayments from "@/pages/user/UserPayments";
+import UserProfile from "@/pages/user/UserProfile";
+import UserServices from "@/pages/user/UserServices";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Link,
@@ -35,14 +41,10 @@ import {
   CalendarDays,
   ChevronDown,
   CreditCard,
-  FileText,
   LayoutDashboard,
   MapIcon,
   Menu,
-  Settings,
-  UserPlus,
   Users,
-  Wrench,
   X,
   Zap,
 } from "lucide-react";
@@ -53,29 +55,24 @@ const queryClient = new QueryClient();
 const navItems = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
   { path: "/event-details", label: "Event Details", icon: CalendarDays },
-  { path: "/booth-map", label: "Booth Map", icon: MapIcon },
   { path: "/vendors", label: "Vendors", icon: Users },
-  { path: "/visitors", label: "Visitors", icon: Activity },
-  { path: "/analytics", label: "Analytics", icon: BarChart2 },
-  { path: "/documents", label: "Documents", icon: FileText },
-  { path: "/payments", label: "Payments", icon: CreditCard },
-  { path: "/services", label: "Services", icon: Wrench },
-  { path: "/settings", label: "Settings", icon: Settings },
-  { path: "/user-register", label: "User Register", icon: UserPlus },
+  { path: "/booth-map", label: "Booth Allocation", icon: MapIcon },
+  { path: "/payments", label: "Payment Monitoring", icon: CreditCard },
+  { path: "/visitors", label: "Crowd", icon: Activity },
+  { path: "/analytics", label: "Report", icon: BarChart2 },
 ];
 
 const pageTitles: Record<string, string> = {
   "/": "Dashboard",
   "/event-details": "Event Details",
-  "/booth-map": "Booth Map",
+  "/booth-map": "Booth Allocation",
   "/vendors": "Vendor Management",
-  "/visitors": "Visitor Monitoring",
-  "/analytics": "Analytics & Reports",
+  "/visitors": "Crowd Monitoring",
+  "/analytics": "Reports & Analytics",
   "/documents": "Document Verification",
-  "/payments": "Payment Tracking",
+  "/payments": "Payment Monitoring",
   "/services": "Service Providers",
   "/settings": "Settings",
-  "/user-register": "User Registration",
 };
 
 interface LayoutProps {
@@ -149,7 +146,7 @@ function Layout({ onSignOut, authName }: LayoutProps) {
             {pageTitle}
           </h1>
 
-          <div className="relative" data-ocid="header.notification.button">
+          <div className="relative">
             <Button
               variant="ghost"
               size="icon"
@@ -163,7 +160,7 @@ function Layout({ onSignOut, authName }: LayoutProps) {
           </div>
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild data-ocid="header.user.dropdown_menu">
+            <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 className="flex items-center gap-2 text-sm font-medium"
@@ -181,7 +178,6 @@ function Layout({ onSignOut, authName }: LayoutProps) {
               <DropdownMenuItem
                 className="text-destructive"
                 onClick={onSignOut}
-                data-ocid="header.signout.button"
               >
                 Sign Out
               </DropdownMenuItem>
@@ -209,95 +205,135 @@ function Layout({ onSignOut, authName }: LayoutProps) {
   );
 }
 
-const rootRoute = createRootRoute({
-  component: () => <Outlet />,
-});
+// ─── Admin router ───────────────────────────────────────────────────────────
 
-function makeLayoutRoute(onSignOut: () => void, authName: string) {
+const adminRootRoute = createRootRoute({ component: () => <Outlet /> });
+
+function makeAdminLayoutRoute(onSignOut: () => void, authName: string) {
   return createRoute({
-    getParentRoute: () => rootRoute,
-    id: "layout",
+    getParentRoute: () => adminRootRoute,
+    id: "admin-layout",
     component: () => <Layout onSignOut={onSignOut} authName={authName} />,
   });
 }
 
-function buildRouter(onSignOut: () => void, authName: string) {
-  const layoutRoute = makeLayoutRoute(onSignOut, authName);
+function buildAdminRouter(onSignOut: () => void, authName: string) {
+  const layoutRoute = makeAdminLayoutRoute(onSignOut, authName);
 
-  const indexRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/",
-    component: Dashboard,
-  });
-  const eventDetailsRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/event-details",
-    component: EventDetails,
-  });
-  const boothMapRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/booth-map",
-    component: BoothMap,
-  });
-  const vendorsRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/vendors",
-    component: Vendors,
-  });
-  const visitorsRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/visitors",
-    component: Visitors,
-  });
-  const analyticsRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/analytics",
-    component: Analytics,
-  });
-  const settingsRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/settings",
-    component: SettingsPage,
-  });
-  const documentsRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/documents",
-    component: Documents,
-  });
-  const paymentsRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/payments",
-    component: Payments,
-  });
-  const servicesRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/services",
-    component: Services,
-  });
-  const userRegisterRoute = createRoute({
-    getParentRoute: () => layoutRoute,
-    path: "/user-register",
-    component: UserRegister,
-  });
+  const routes = [
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/",
+      component: Dashboard,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/event-details",
+      component: EventDetails,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/booth-map",
+      component: BoothMap,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/vendors",
+      component: Vendors,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/visitors",
+      component: Visitors,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/analytics",
+      component: Analytics,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/settings",
+      component: SettingsPage,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/documents",
+      component: Documents,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/payments",
+      component: Payments,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/services",
+      component: Services,
+    }),
+  ];
 
-  const routeTree = rootRoute.addChildren([
-    layoutRoute.addChildren([
-      indexRoute,
-      eventDetailsRoute,
-      boothMapRoute,
-      vendorsRoute,
-      visitorsRoute,
-      analyticsRoute,
-      settingsRoute,
-      documentsRoute,
-      paymentsRoute,
-      servicesRoute,
-      userRegisterRoute,
-    ]),
+  const routeTree = adminRootRoute.addChildren([
+    layoutRoute.addChildren(routes),
   ]);
-
   return createRouter({ routeTree });
 }
+
+// ─── User portal router ──────────────────────────────────────────────────────
+
+const userRootRoute = createRootRoute({ component: () => <Outlet /> });
+
+function makeUserLayoutRoute(onSignOut: () => void, authName: string) {
+  return createRoute({
+    getParentRoute: () => userRootRoute,
+    id: "user-layout",
+    component: () => <UserLayout onSignOut={onSignOut} authName={authName} />,
+  });
+}
+
+function buildUserRouter(onSignOut: () => void, authName: string) {
+  const layoutRoute = makeUserLayoutRoute(onSignOut, authName);
+
+  const routes = [
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/",
+      component: UserDashboard,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/booth-apply",
+      component: UserBoothApply,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/documents",
+      component: UserDocuments,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/payments",
+      component: UserPayments,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/services",
+      component: UserServices,
+    }),
+    createRoute({
+      getParentRoute: () => layoutRoute,
+      path: "/profile",
+      component: UserProfile,
+    }),
+  ];
+
+  const routeTree = userRootRoute.addChildren([
+    layoutRoute.addChildren(routes),
+  ]);
+  return createRouter({ routeTree });
+}
+
+// ─── Root App ────────────────────────────────────────────────────────────────
 
 export default function App() {
   const [auth, setAuth] = useState<{ role: string; name: string } | null>(
@@ -312,12 +348,10 @@ export default function App() {
   );
 
   function handleLogin(role: "admin" | "user") {
-    try {
-      const stored = localStorage.getItem("exhibitrack_auth");
-      if (stored) setAuth(JSON.parse(stored));
-    } catch {
-      setAuth({ role, name: role === "admin" ? "Rajesh Kumar" : "User" });
-    }
+    const name = role === "admin" ? "Admin" : "User";
+    const authData = { role, name };
+    localStorage.setItem("exhibitrack_auth", JSON.stringify(authData));
+    setAuth(authData);
   }
 
   function handleSignOut() {
@@ -334,7 +368,10 @@ export default function App() {
     );
   }
 
-  const router = buildRouter(handleSignOut, auth.name);
+  const router =
+    auth.role === "user"
+      ? buildUserRouter(handleSignOut, auth.name)
+      : buildAdminRouter(handleSignOut, auth.name);
 
   return (
     <QueryClientProvider client={queryClient}>

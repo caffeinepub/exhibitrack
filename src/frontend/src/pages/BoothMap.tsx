@@ -36,6 +36,22 @@ export default function BoothMap() {
     );
   }
 
+  function assignVendor(boothId: string, vendorId: string | null) {
+    const newStatus: BoothStatus = vendorId ? "Occupied" : "Available";
+    setBooths((prev) =>
+      prev.map((b) =>
+        b.id === boothId
+          ? { ...b, vendorId: vendorId ?? undefined, status: newStatus }
+          : b,
+      ),
+    );
+    setSelected((prev) =>
+      prev && prev.id === boothId
+        ? { ...prev, vendorId: vendorId ?? undefined, status: newStatus }
+        : prev,
+    );
+  }
+
   function getBoothClass(booth: Booth) {
     const base =
       "rounded-lg flex flex-col items-center justify-center cursor-pointer border-2 transition-all duration-200";
@@ -193,7 +209,7 @@ export default function BoothMap() {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 mb-3">
               <p className="text-xs text-muted-foreground font-medium">
                 Change Status
               </p>
@@ -215,6 +231,33 @@ export default function BoothMap() {
                   ),
                 )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground font-medium">
+                Assign Vendor
+              </p>
+              <Select
+                value={selected.vendorId ?? "__unassign__"}
+                onValueChange={(val) =>
+                  assignVendor(selected.id, val === "__unassign__" ? null : val)
+                }
+              >
+                <SelectTrigger
+                  className="w-full text-xs"
+                  data-ocid="booth_map.assign_vendor.select"
+                >
+                  <SelectValue placeholder="-- Select Vendor --" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__unassign__">-- Unassign --</SelectItem>
+                  {initialVendors.map((v) => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.companyName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </motion.div>
         )}
